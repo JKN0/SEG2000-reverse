@@ -1,0 +1,972 @@
+                                ;
+                                ;       Disassembled by:
+                                ;               DASMx object code disassembler
+                                ;               (c) Copyright 1996-2003   Conquest Consultants
+                                ;               Version 1.40 (Oct 18 2003)
+                                ;
+                                ;       File:           seg2000.bin
+                                ;
+                                ;       Size:           1024 bytes
+                                ;       Checksum:       E175
+                                ;       CRC-32:         3E3BB810
+                                ;
+                                ;       Date:           Sat Mar 03 10:05:07 2018
+                                ;
+                                ;       CPU:            Intel 8048 (MCS-48 family)
+                                ;
+                                ;
+                                ;
+                                        org     00000H
+                                ;----------------------------------
+                                ; Initializations
+0000 : A5               " "             clr     f1
+0001 : B5               " "             cpl     f1
+0002 : B8 15            "  "            mov     r0,#015H
+0004 : B0 00            "  "            mov     @r0,#000H
+0006 : B8 20            "  "            mov     r0,#020H
+0008 : B0 E0            "  "            mov     @r0,#0E0H
+000A : B8 24            " $"            mov     r0,#024H
+000C : B0 E0            "  "            mov     @r0,#0E0H
+000E : 18               " "             inc     r0
+000F : B0 00            "  "            mov     @r0,#000H
+0011 : 18               " "             inc     r0
+0012 : B0 00            "  "            mov     @r0,#000H
+0014 : B8 29            " )"            mov     r0,#029H
+0016 : B0 E0            "  "            mov     @r0,#0E0H
+0018 : B8 2C            " ,"            mov     r0,#02CH
+001A : B0 14            "  "            mov     @r0,#014H
+001C : 18               " "             inc     r0
+001D : B0 60            " `"            mov     @r0,#060H
+001F : 18               " "             inc     r0
+0020 : B0 74            " t"            mov     @r0,#074H
+0022 : 18               " "             inc     r0
+0023 : B0 74            " t"            mov     @r0,#074H
+0025 : B8 16            "  "            mov     r0,#016H
+0027 : B0 E4            "  "            mov     @r0,#0E4H
+
+                                ; clear 30H...3FH
+0029 : B8 30            " 0"            mov     r0,#030H
+002B                            L002B:
+002B : B0 00            "  "            mov     @r0,#000H
+002D : 23 3F            "#?"            mov     a,#03FH
+002F : D8               " "             xrl     a,r0
+0030 : 18               " "             inc     r0
+0031 : 96 2B            " +"            jnz     L002B
+
+0033 : D5               " "             sel     rb1
+0034 : 27               "'"             clr     a
+0035 : AC               " "             mov     r4,a            ; 0C <- 0
+0036 : AE               " "             mov     r6,a            ; 0E <- 0 lamp control 
+0037 : C5               " "             sel     rb0
+0038 : BE 17            "  "            mov     r6,#017H
+003A : BF 16            "  "            mov     r7,#016H
+003C : 95               " "             cpl     f0
+003D                            
+                                ; ----- Main loop start -----
+                                ;
+                                ; Scan four highest rows of switch matrix: S1...S26,S33,S39
+                                L003D:
+                                ; row 7: S1...S7
+003D : 23 7F            "# "            mov     a,#07FH
+003F : B8 30            " 0"            mov     r0,#030H
+0041 : 54 FA            "T "            call    L02FA           ; scan
+0043 : B8 20            "  "            mov     r0,#020H
+0045 : 74 0F            "t "            call    L030F           ; scan result -> lamp nr
+                                 ; row 6: S8...S14
+0047 : 23 BF            "# "            mov     a,#0BFH
+0049 : B8 32            " 2"            mov     r0,#032H
+004B : 54 FA            "T "            call    L02FA
+004D : B8 24            " $"            mov     r0,#024H
+004F : 74 0F            "t "            call    L030F
+                                ; row 5: S15...S21
+0051 : 23 DF            "# "            mov     a,#0DFH
+0053 : B8 34            " 4"            mov     r0,#034H
+0055 : 54 FA            "T "            call    L02FA
+0057 : B8 29            " )"            mov     r0,#029H
+0059 : 74 0F            "t "            call    L030F
+                                ; row 4: S22...S26,S33,S39
+005B : D5               " "             sel     rb1
+005C : 23 EF            "# "            mov     a,#0EFH
+005E : B8 36            " 6"            mov     r0,#036H
+0060 : 54 FA            "T "            call    L02FA           ; scan
+0062 : 53 E0            "S "            anl     a,#0E0H         ; S24...S26 only
+0064 : A9               " "             mov     r1,a
+0065 : B8 2C            " ,"            mov     r0,#02CH
+0067 : D3 80            "  "            xrl     a,#080H
+0069 : 96 6D            " m"            jnz     L006D
+006B : B0 14            "  "            mov     @r0,#014H       ; S24 -> 2C=14
+006D                            L006D:
+006D : F9               " "             mov     a,r1
+006E : D3 40            " @"            xrl     a,#040H         
+0070 : 96 74            " t"            jnz     L0074
+0072 : B0 1A            "  "            mov     @r0,#01AH       ; S25 -> 2C=1A
+0074                            L0074:
+0074 : F9               " "             mov     a,r1
+0075 : D3 20            "  "            xrl     a,#020H
+0077 : 96 7B            " {"            jnz     L007B
+0079 : B0 0C            "  "            mov     @r0,#00CH       ; S26 -> 2C=0C
+007B                            L007B:
+007B : FA               " "             mov     a,r2
+007C : 53 18            "S "            anl     a,#018H         ; S22,S23 only
+007E : A9               " "             mov     r1,a
+007F : B8 29            " )"            mov     r0,#029H
+0081 : D3 10            "  "            xrl     a,#010H
+0083 : 96 87            "  "            jnz     L0087
+0085 : B0 10            "  "            mov     @r0,#010H       ; S22 -> 29=10
+0087                            L0087:
+0087 : F9               " "             mov     a,r1
+0088 : D3 08            "  "            xrl     a,#008H         
+008A : 96 8E            "  "            jnz     L008E
+008C : B0 08            "  "            mov     @r0,#008H       ; S23 -> 29=08
+008E                            L008E:
+008E : B9 80            "  "            mov     r1,#080H
+0090 : 23 04            "# "            mov     a,#004H
+0092 : 74 40            "t@"            call    L0340
+0094 : 85               " "             clr     f0
+0095 : C6 98            "  "            jz      L0098
+0097 : 95               " "             cpl     f0
+0098                            L0098:
+0098 : FA               " "             mov     a,r2
+0099 : 53 02            "S "            anl     a,#002H
+009B : 77               "w"             rr      a
+009C : B8 24            " $"            mov     r0,#024H
+009E : 30               "0"             xchd    a,@r0
+
+                                ; scan four lowest rows of switch matrix
+009F : 23 F7            "# "            mov     a,#0F7H
+00A1 : B8 38            " 8"            mov     r0,#038H
+00A3 : 54 FA            "T "            call    L02FA
+00A5 : B8 2D            " -"            mov     r0,#02DH
+00A7 : FA               " "             mov     a,r2
+00A8 : 74 0F            "t "            call    L030F
+00AA : 23 FB            "# "            mov     a,#0FBH
+00AC : B8 3A            " :"            mov     r0,#03AH
+00AE : 54 FA            "T "            call    L02FA
+00B0 : 53 3F            "S?"            anl     a,#03FH
+00B2 : AF               " "             mov     r7,a
+00B3 : B9 20            "  "            mov     r1,#020H
+00B5 : 23 80            "# "            mov     a,#080H
+00B7 : 74 40            "t@"            call    L0340
+00B9 : B8 25            " %"            mov     r0,#025H
+00BB : 6E               "n"             add     a,r6
+00BC : AE               " "             mov     r6,a
+00BD : E7               " "             rl      a
+00BE : E7               " "             rl      a
+00BF : A0               " "             mov     @r0,a
+00C0 : FF               " "             mov     a,r7
+00C1 : 53 03            "S "            anl     a,#003H
+00C3 : C6 CD            "  "            jz      L00CD
+00C5 : B9 10            "  "            mov     r1,#010H
+00C7 : 23 40            "#@"            mov     a,#040H
+00C9 : 74 40            "t@"            call    L0340
+00CB : 6C               "l"             add     a,r4
+00CC : AC               " "             mov     r4,a
+00CD                            L00CD:
+00CD : C5               " "             sel     rb0
+00CE : 23 FD            "# "            mov     a,#0FDH
+00D0 : B8 3C            " <"            mov     r0,#03CH
+00D2 : 54 FA            "T "            call    L02FA
+00D4 : 74 53            "tS"            call    L0353
+00D6 : B8 2A            " *"            mov     r0,#02AH
+00D8 : A0               " "             mov     @r0,a
+00D9 : FA               " "             mov     a,r2
+00DA : 74 53            "tS"            call    L0353
+00DC : B8 21            " !"            mov     r0,#021H
+00DE : E7               " "             rl      a
+00DF : E7               " "             rl      a
+00E0 : A0               " "             mov     @r0,a
+00E1 : 74 53            "tS"            call    L0353
+00E3 : 18               " "             inc     r0
+00E4 : A0               " "             mov     @r0,a
+00E5 : 23 FE            "# "            mov     a,#0FEH
+00E7 : B8 3E            " >"            mov     r0,#03EH
+00E9 : 54 FA            "T "            call    L02FA
+00EB : B8 26            " &"            mov     r0,#026H
+00ED : B9 2F            " /"            mov     r1,#02FH
+00EF : F1               " "             mov     a,@r1
+00F0 : 32 F4            "2 "            jb1     L00F4
+00F2 : 24 06            "$ "            jmp     L0106
+                                ;
+00F4                            L00F4:
+00F4 : FA               " "             mov     a,r2
+00F5 : F2 F9            "  "            jb7     L00F9
+00F7 : 04 FF            "  "            jmp     L00FF
+                                ;
+00F9                            L00F9:
+00F9 : B0 10            "  "            mov     @r0,#010H
+00FB : 24 08            "$ "            jmp     L0108
+                                ;
+00FD : 00               " "             nop
+00FE : 00               " "             nop
+00FF                            L00FF:
+00FF : 37               "7"             cpl     a
+0100 : D2 06            "  "            jb6     L0106
+0102 : B0 00            "  "            mov     @r0,#000H
+0104 : 24 08            "$ "            jmp     L0108
+                                ;
+0106                            L0106:
+0106 : B0 08            "  "            mov     @r0,#008H
+0108                            L0108:
+0108 : FA               " "             mov     a,r2
+0109 : 37               "7"             cpl     a
+010A : B2 0F            "  "            jb5     L010F
+010C : B8 22            " ""            mov     r0,#022H
+010E : 10               " "             inc     @r0
+010F                            L010F:
+010F : B8 20            "  "            mov     r0,#020H
+0111 : F0               " "             mov     a,@r0
+0112 : 74 65            "te"            call    L0365
+0114 : B8 24            " $"            mov     r0,#024H
+0116 : F0               " "             mov     a,@r0
+0117 : 74 65            "te"            call    L0365
+0119 : B8 29            " )"            mov     r0,#029H
+011B : F0               " "             mov     a,@r0
+011C : 74 67            "tg"            call    L0367
+011E : B8 2C            " ,"            mov     r0,#02CH
+0120 : F0               " "             mov     a,@r0
+0121 : 74 67            "tg"            call    L0367
+0123 : FE               " "             mov     a,r6
+0124 : A9               " "             mov     r1,a
+0125 : D5               " "             sel     rb1
+0126 : FF               " "             mov     a,r7
+0127 : 37               "7"             cpl     a
+0128 : C5               " "             sel     rb0
+0129 : 72 31            "r1"            jb3     L0131
+012B : BE 17            "  "            mov     r6,#017H
+012D : BF 16            "  "            mov     r7,#016H
+012F : 24 37            "$7"            jmp     L0137
+                                ;
+0131                            L0131:
+0131 : 52 37            "R7"            jb2     L0137
+0133 : BE 16            "  "            mov     r6,#016H
+0135 : BF 17            "  "            mov     r7,#017H
+0137                            L0137:
+0137 : F9               " "             mov     a,r1
+0138 : DE               " "             xrl     a,r6
+0139 : B9 2B            " +"            mov     r1,#02BH
+013B : C6 4A            " J"            jz      L014A
+013D : FE               " "             mov     a,r6
+013E : A8               " "             mov     r0,a
+013F : F0               " "             mov     a,@r0
+0140 : A1               " "             mov     @r1,a
+0141 : 53 06            "S "            anl     a,#006H
+0143 : C9               " "             dec     r1
+0144 : A1               " "             mov     @r1,a
+0145 : F0               " "             mov     a,@r0
+0146 : 53 F8            "S "            anl     a,#0F8H
+0148 : C9               " "             dec     r1
+0149 : A1               " "             mov     @r1,a
+014A                            L014A:
+014A : FE               " "             mov     a,r6
+014B : A8               " "             mov     r0,a
+014C : B9 2B            " +"            mov     r1,#02BH
+014E : F1               " "             mov     a,@r1
+014F : A0               " "             mov     @r0,a
+0150 : B8 2E            " ."            mov     r0,#02EH
+0152 : F0               " "             mov     a,@r0
+0153 : 18               " "             inc     r0
+0154 : A0               " "             mov     @r0,a
+0155 : B8 24            " $"            mov     r0,#024H
+0157 : F0               " "             mov     a,@r0
+0158 : 67               "g"             rrc     a
+0159 : E6 61            " a"            jnc     L0161
+015B : FE               " "             mov     a,r6
+015C : A8               " "             mov     r0,a
+015D : FF               " "             mov     a,r7
+015E : A9               " "             mov     r1,a
+015F : F0               " "             mov     a,@r0
+0160 : A1               " "             mov     @r1,a
+0161                            L0161:
+0161 : 95               " "             cpl     f0
+0162 : B6 77            " w"            jf0     L0177
+0164 : FE               " "             mov     a,r6
+0165 : A8               " "             mov     r0,a
+0166 : FF               " "             mov     a,r7
+0167 : A9               " "             mov     r1,a
+0168 : F0               " "             mov     a,@r0
+0169 : 21               "!"             xch     a,@r1
+016A : A0               " "             mov     @r0,a
+016B : B9 2B            " +"            mov     r1,#02BH
+016D : A1               " "             mov     @r1,a
+016E : 53 06            "S "            anl     a,#006H
+0170 : C9               " "             dec     r1
+0171 : A1               " "             mov     @r1,a
+0172 : F0               " "             mov     a,@r0
+0173 : 53 F8            "S "            anl     a,#0F8H
+0175 : C9               " "             dec     r1
+0176 : A1               " "             mov     @r1,a
+0177                            L0177:
+0177 : B8 16            "  "            mov     r0,#016H
+0179 : F0               " "             mov     a,@r0
+017A : 18               " "             inc     r0
+017B : D0               " "             xrl     a,@r0
+017C : 53 10            "S "            anl     a,#010H
+017E : C6 90            "  "            jz      L0190
+0180 : B9 23            " #"            mov     r1,#023H
+0182 : F1               " "             mov     a,@r1
+0183 : 53 FE            "S "            anl     a,#0FEH
+0185 : A1               " "             mov     @r1,a
+0186 : B9 27            " '"            mov     r1,#027H
+0188 : F1               " "             mov     a,@r1
+0189 : 53 FD            "S "            anl     a,#0FDH
+018B : A1               " "             mov     @r1,a
+018C : D5               " "             sel     rb1
+018D : 27               "'"             clr     a
+018E : AE               " "             mov     r6,a
+018F : C5               " "             sel     rb0
+0190                            L0190:
+0190 : B8 0E            "  "            mov     r0,#00EH
+0192 : B9 20            "  "            mov     r1,#020H
+0194 : F1               " "             mov     a,@r1
+0195 : A0               " "             mov     @r0,a
+0196 : B9 24            " $"            mov     r1,#024H
+0198 : F1               " "             mov     a,@r1
+0199 : 53 E0            "S "            anl     a,#0E0H
+019B : 47               "G"             swap    a
+019C : E7               " "             rl      a
+019D : 60               "`"             add     a,@r0
+019E : A0               " "             mov     @r0,a
+019F : FF               " "             mov     a,r7
+01A0 : A9               " "             mov     r1,a
+01A1 : F1               " "             mov     a,@r1
+01A2 : AA               " "             mov     r2,a
+01A3 : 53 06            "S "            anl     a,#006H
+01A5 : 77               "w"             rr      a
+01A6 : 60               "`"             add     a,@r0
+01A7 : A0               " "             mov     @r0,a
+01A8 : FA               " "             mov     a,r2
+01A9 : 03 20            "  "            add     a,#020H
+01AB : F6 B1            "  "            jc      L01B1
+01AD : 23 03            "# "            mov     a,#003H
+01AF : 40               "@"             orl     a,@r0
+01B0 : A0               " "             mov     @r0,a
+01B1                            L01B1:
+01B1 : 18               " "             inc     r0
+01B2 : FA               " "             mov     a,r2
+01B3 : A0               " "             mov     @r0,a
+01B4 : B9 2B            " +"            mov     r1,#02BH
+01B6 : F1               " "             mov     a,@r1
+01B7 : 47               "G"             swap    a
+01B8 : 30               "0"             xchd    a,@r0
+01B9 : 85               " "             clr     f0
+01BA : B8 28            " ("            mov     r0,#028H
+01BC : B0 00            "  "            mov     @r0,#000H
+01BE : D5               " "             sel     rb1
+01BF : FF               " "             mov     a,r7
+01C0 : C5               " "             sel     rb0
+01C1 : 2A               "*"             xch     a,r2
+01C2 : 72 CF            "r "            jb3     L01CF
+01C4 : FE               " "             mov     a,r6
+01C5 : A9               " "             mov     r1,a
+01C6 : F1               " "             mov     a,@r1
+01C7 : 37               "7"             cpl     a
+01C8 : 72 DB            "r "            jb3     L01DB
+01CA : FA               " "             mov     a,r2
+01CB : 72 DB            "r "            jb3     L01DB
+01CD : 52 DB            "R "            jb2     L01DB
+01CF                            L01CF:
+01CF : 95               " "             cpl     f0
+01D0 : B9 2F            " /"            mov     r1,#02FH
+01D2 : F1               " "             mov     a,@r1
+01D3 : 37               "7"             cpl     a
+01D4 : 92 D9            "  "            jb4     L01D9
+01D6 : FA               " "             mov     a,r2
+01D7 : 92 DB            "  "            jb4     L01DB
+01D9                            L01D9:
+01D9 : B0 40            " @"            mov     @r0,#040H
+01DB                            L01DB:
+01DB : 95               " "             cpl     f0
+01DC : B6 EB            "  "            jf0     L01EB
+01DE : B9 2F            " /"            mov     r1,#02FH
+01E0 : F1               " "             mov     a,@r1
+01E1 : 37               "7"             cpl     a
+01E2 : 92 E7            "  "            jb4     L01E7
+01E4 : FA               " "             mov     a,r2
+01E5 : B2 EB            "  "            jb5     L01EB
+01E7                            L01E7:
+01E7 : F0               " "             mov     a,@r0
+01E8 : 43 80            "C "            orl     a,#080H
+01EA : A0               " "             mov     @r0,a
+01EB                            L01EB:
+01EB : B9 27            " '"            mov     r1,#027H
+01ED : F1               " "             mov     a,@r1
+01EE : 12 FA            "  "            jb0     L01FA
+01F0 : B9 2B            " +"            mov     r1,#02BH
+01F2 : F1               " "             mov     a,@r1
+01F3 : 92 FE            "  "            jb4     L01FE
+01F5 : FA               " "             mov     a,r2
+01F6 : 53 0C            "S "            anl     a,#00CH
+01F8 : 96 FE            "  "            jnz     L01FE
+01FA                            L01FA:
+01FA : F0               " "             mov     a,@r0
+01FB : 43 20            "C "            orl     a,#020H
+01FD : A0               " "             mov     @r0,a
+01FE                            L01FE:
+01FE : B8 10            "  "            mov     r0,#010H
+0200 : B0 00            "  "            mov     @r0,#000H
+0202 : B8 28            " ("            mov     r0,#028H
+0204 : F0               " "             mov     a,@r0
+0205 : 37               "7"             cpl     a
+0206 : AA               " "             mov     r2,a
+0207 : B8 0E            "  "            mov     r0,#00EH
+0209 : D2 10            "  "            jb6     L0210
+020B : F0               " "             mov     a,@r0
+020C : 47               "G"             swap    a
+020D : 74 6C            "tl"            call    L036C
+020F : FA               " "             mov     a,r2
+0210                            L0210:
+0210 : F2 16            "  "            jb7     L0216
+0212 : F0               " "             mov     a,@r0
+0213 : 77               "w"             rr      a
+0214 : 74 6C            "tl"            call    L036C
+0216                            L0216:
+0216 : B8 0F            "  "            mov     r0,#00FH
+0218 : F0               " "             mov     a,@r0
+0219 : 47               "G"             swap    a
+021A : 74 6C            "tl"            call    L036C
+021C : FA               " "             mov     a,r2
+021D : B2 22            " ""            jb5     L0222
+021F : F0               " "             mov     a,@r0
+0220 : 74 6C            "tl"            call    L036C
+0222                            L0222:
+0222 : B8 28            " ("            mov     r0,#028H
+0224 : F0               " "             mov     a,@r0
+0225 : 61               "a"             add     a,@r1
+0226 : A1               " "             mov     @r1,a
+0227 : B8 17            "  "            mov     r0,#017H
+0229 : F0               " "             mov     a,@r0
+022A : AC               " "             mov     r4,a
+022B : C8               " "             dec     r0
+022C : F0               " "             mov     a,@r0
+022D : AB               " "             mov     r3,a
+022E : FF               " "             mov     a,r7
+022F : A8               " "             mov     r0,a
+0230 : F0               " "             mov     a,@r0
+0231 : 37               "7"             cpl     a
+0232 : 92 3B            " ;"            jb4     L023B
+0234 : B9 2B            " +"            mov     r1,#02BH
+0236 : F1               " "             mov     a,@r1
+0237 : AC               " "             mov     r4,a
+0238 : 43 10            "C "            orl     a,#010H
+023A : AB               " "             mov     r3,a
+023B                            L023B:
+023B : FE               " "             mov     a,r6
+023C : A9               " "             mov     r1,a
+023D : F1               " "             mov     a,@r1
+023E : 37               "7"             cpl     a
+023F : 92 46            " F"            jb4     L0246
+0241 : F0               " "             mov     a,@r0
+0242 : AB               " "             mov     r3,a
+0243 : 43 10            "C "            orl     a,#010H
+0245 : AC               " "             mov     r4,a
+0246                            L0246:
+0246 : B8 2F            " /"            mov     r0,#02FH
+0248 : F0               " "             mov     a,@r0
+0249 : 53 FE            "S "            anl     a,#0FEH
+024B : A0               " "             mov     @r0,a
+024C : D5               " "             sel     rb1
+024D : FF               " "             mov     a,r7
+024E : C5               " "             sel     rb0
+024F : 72 52            "rR"            jb3     L0252
+0251 : 1C               " "             inc     r4
+0252                            L0252:
+0252 : 52 57            "RW"            jb2     L0257
+0254 : B8 2F            " /"            mov     r0,#02FH
+0256 : 10               " "             inc     @r0
+0257                            L0257:
+0257 : B8 27            " '"            mov     r0,#027H
+0259 : 74 92            "t "            call    L0392
+025B : D5               " "             sel     rb1
+025C : FF               " "             mov     a,r7
+025D : 37               "7"             cpl     a
+025E : 32 67            "2g"            jb1     L0267
+0260 : 76 7E            "v~"            jf1     L027E
+0262 : BC 00            "  "            mov     r4,#000H
+0264 : B5               " "             cpl     f1
+0265 : 44 7C            "D|"            jmp     L027C
+                                ;
+0267                            L0267:
+0267 : 37               "7"             cpl     a
+0268 : 12 75            " u"            jb0     L0275
+026A : C5               " "             sel     rb0
+026B : 76 71            "vq"            jf1     L0271
+026D : 74 97            "t "            call    L0397
+026F : 44 7E            "D~"            jmp     L027E
+                                ;
+0271                            L0271:
+0271 : 74 A0            "t "            call    L03A0
+0273 : 44 7E            "D~"            jmp     L027E
+                                ;
+0275                            L0275:
+0275 : 76 79            "vy"            jf1     L0279
+0277 : 44 7E            "D~"            jmp     L027E
+                                ;
+0279                            L0279:
+0279 : BC 80            "  "            mov     r4,#080H
+027B : A5               " "             clr     f1
+027C                            L027C:
+027C : 74 92            "t "            call    L0392
+027E                            L027E:
+027E : C5               " "             sel     rb0
+027F : 00               " "             nop
+0280 : 00               " "             nop
+0281 : 00               " "             nop
+0282 : 00               " "             nop
+0283 : 00               " "             nop
+0284 : 00               " "             nop
+0285 : 00               " "             nop
+0286 : 00               " "             nop
+0287 : 00               " "             nop
+0288 : 00               " "             nop
+0289 : 00               " "             nop
+028A : 00               " "             nop
+028B : B8 0E            "  "            mov     r0,#00EH
+028D : B9 FD            "  "            mov     r1,#0FDH
+028F : 74 87            "t "            call    L0387
+0291 : 18               " "             inc     r0
+0292 : B9 FB            "  "            mov     r1,#0FBH
+0294 : 74 87            "t "            call    L0387
+0296 : 18               " "             inc     r0
+0297 : B9 FE            "  "            mov     r1,#0FEH
+0299 : 74 87            "t "            call    L0387
+029B : B8 15            "  "            mov     r0,#015H
+029D : F0               " "             mov     a,@r0
+029E : 03 40            " @"            add     a,#040H
+02A0 : A0               " "             mov     @r0,a
+02A1 : F6 A5            "  "            jc      L02A5
+02A3 : 04 3D            " ="            jmp     L003D           ; to main loop
+                                ;
+02A5                            L02A5:
+02A5 : B8 2F            " /"            mov     r0,#02FH
+02A7 : F0               " "             mov     a,@r0
+02A8 : 37               "7"             cpl     a
+02A9 : 92 DE            "  "            jb4     L02DE
+02AB : B8 23            " #"            mov     r0,#023H
+02AD : B9 21            " !"            mov     r1,#021H
+02AF : D5               " "             sel     rb1
+02B0 : FF               " "             mov     a,r7
+02B1 : 37               "7"             cpl     a
+02B2 : B2 C6            "  "            jb5     L02C6
+02B4 : B8 27            " '"            mov     r0,#027H
+02B6 : F0               " "             mov     a,@r0
+02B7 : 53 1F            "S "            anl     a,#01FH
+02B9 : B9 20            "  "            mov     r1,#020H
+02BB : 61               "a"             add     a,@r1
+02BC : A0               " "             mov     @r0,a
+02BD : C5               " "             sel     rb0
+02BE : F0               " "             mov     a,@r0
+02BF : 53 F9            "S "            anl     a,#0F9H
+02C1 : 21               "!"             xch     a,@r1
+02C2 : 77               "w"             rr      a
+02C3 : 77               "w"             rr      a
+02C4 : 61               "a"             add     a,@r1
+02C5 : A0               " "             mov     @r0,a
+02C6                            L02C6:
+02C6 : D5               " "             sel     rb1
+02C7 : FF               " "             mov     a,r7
+02C8 : 37               "7"             cpl     a
+02C9 : C5               " "             sel     rb0
+02CA : 92 DE            "  "            jb4     L02DE
+02CC : F0               " "             mov     a,@r0
+02CD : 53 07            "S "            anl     a,#007H
+02CF : 19               " "             inc     r1
+02D0 : 21               "!"             xch     a,@r1
+02D1 : 53 06            "S "            anl     a,#006H
+02D3 : E7               " "             rl      a
+02D4 : E7               " "             rl      a
+02D5 : 61               "a"             add     a,@r1
+02D6 : AA               " "             mov     r2,a
+02D7 : B9 24            " $"            mov     r1,#024H
+02D9 : F1               " "             mov     a,@r1
+02DA : 53 E0            "S "            anl     a,#0E0H
+02DC : 6A               "j"             add     a,r2
+02DD : A0               " "             mov     @r0,a
+02DE                            L02DE:
+02DE : 36 DE            "6 "            jt0     L02DE
+02E0                            L02E0:
+02E0 : 26 E0            "& "            jnt0    L02E0
+02E2 : B8 23            " #"            mov     r0,#023H
+02E4 : B9 7F            "  "            mov     r1,#07FH
+02E6 : 74 87            "t "            call    L0387
+02E8 : B8 27            " '"            mov     r0,#027H
+02EA : 74 87            "t "            call    L0387
+02EC : B8 03            "  "            mov     r0,#003H
+02EE : 74 87            "t "            call    L0387
+02F0 : B8 04            "  "            mov     r0,#004H
+02F2 : 74 87            "t "            call    L0387
+02F4 : B8 2F            " /"            mov     r0,#02FH
+02F6 : 74 87            "t "            call    L0387
+02F8 : 04 3D            " ="            jmp     L003D           ; to main loop
+
+                                ;---------------------------------------
+                                ; Switch scan routine
+                                ; in:
+                                ;     A = P2 scan mask (inverted one-hot)
+                                ;     R0 = pointer to 30H...3FH
+02FA                            L02FA:
+02FA : 3A               ":"             outl    p2,a            ; scan out
+02FB : 09               " "             in      a,p1            ; scan result in
+02FC : 37               "7"             cpl     a               ; complement result (to one-hot)
+02FD : AA               " "             mov     r2,a            
+02FE : D0               " "             xrl     a,@r0
+02FF : 00               " "             nop
+0300 : 00               " "             nop
+0301 : 96 05            "  "            jnz     L0305
+0303 : 64 0B            "d "            jmp     L030B
+                                ;
+                                ; 
+0305                            L0305:
+0305 : FA               " "             mov     a,r2
+0306 : A0               " "             mov     @r0,a
+0307 : 18               " "             inc     r0
+0308 : F0               " "             mov     a,@r0
+0309 : AA               " "             mov     r2,a
+030A : 83               " "             ret
+                                ;
+030B                            L030B:
+030B : 18               " "             inc     r0
+030C : FA               " "             mov     a,r2
+030D : A0               " "             mov     @r0,a
+030E : 83               " "             ret
+
+                                ;-------------------------------------
+                                ; scan result -> lamp nr
+                                ; in:
+                                ;       A,R2 = scan result (one-hot)
+                                ;       R0 = pointer to lamp nr
+                                ; out:
+                                ;       @R0 = lamp nr in highest 3 bits
+                                ;
+                                ; bit nr -> lamp nr 
+                                ;  7     -> 1 (20H)
+                                ;  6     -> 2 (40H)
+                                ;  ...
+                                ;  2     -> 6 (C0H)
+                                ;  1     -> 7 (E0H)
+030F                            L030F:
+030F : D3 80            "  "            xrl     a,#080H
+0311 : 96 15            "  "            jnz     L0315
+0313 : B0 20            "  "            mov     @r0,#020H
+0315                            L0315:
+0315 : FA               " "             mov     a,r2
+0316 : D3 40            " @"            xrl     a,#040H
+0318 : 96 1C            "  "            jnz     L031C
+031A : B0 40            " @"            mov     @r0,#040H
+031C                            L031C:
+031C : FA               " "             mov     a,r2
+031D : D3 20            "  "            xrl     a,#020H
+031F : 96 23            " #"            jnz     L0323
+0321 : B0 60            " `"            mov     @r0,#060H
+0323                            L0323:
+0323 : FA               " "             mov     a,r2
+0324 : D3 10            "  "            xrl     a,#010H
+0326 : 96 2A            " *"            jnz     L032A
+0328 : B0 80            "  "            mov     @r0,#080H
+032A                            L032A:
+032A : FA               " "             mov     a,r2
+032B : D3 08            "  "            xrl     a,#008H
+032D : 96 31            " 1"            jnz     L0331
+032F : B0 A0            "  "            mov     @r0,#0A0H
+0331                            L0331:
+0331 : FA               " "             mov     a,r2
+0332 : D3 04            "  "            xrl     a,#004H
+0334 : 96 38            " 8"            jnz     L0338
+0336 : B0 C0            "  "            mov     @r0,#0C0H
+0338                            L0338:
+0338 : FA               " "             mov     a,r2
+0339 : D3 02            "  "            xrl     a,#002H
+033B : 96 3F            " ?"            jnz     L033F
+033D : B0 E0            "  "            mov     @r0,#0E0H
+033F                            L033F:
+033F : 83               " "             ret
+                                ;
+0340                            L0340:
+0340 : 5A               "Z"             anl     a,r2
+0341 : C6 4D            " M"            jz      L034D
+0343 : F9               " "             mov     a,r1
+0344 : 5B               "["             anl     a,r3
+0345 : 96 51            " Q"            jnz     L0351
+0347 : F9               " "             mov     a,r1
+0348 : 4B               "K"             orl     a,r3
+0349 : AB               " "             mov     r3,a
+034A : 23 80            "# "            mov     a,#080H
+034C : 83               " "             ret
+                                ;
+034D                            L034D:
+034D : F9               " "             mov     a,r1
+034E : 37               "7"             cpl     a
+034F : 5B               "["             anl     a,r3
+0350 : AB               " "             mov     r3,a
+0351                            L0351:
+0351 : 27               "'"             clr     a
+0352 : 83               " "             ret
+                                ;
+0353                            L0353:
+0353 : FA               " "             mov     a,r2
+0354 : F7               " "             rlc     a
+0355 : E6 5B            " ["            jnc     L035B
+0357 : E7               " "             rl      a
+0358 : AA               " "             mov     r2,a
+0359 : 27               "'"             clr     a
+035A : 83               " "             ret
+                                ;
+035B                            L035B:
+035B : F7               " "             rlc     a
+035C : AA               " "             mov     r2,a
+035D : E6 62            " b"            jnc     L0362
+035F : 23 02            "# "            mov     a,#002H
+0361 : 83               " "             ret
+                                ;
+0362                            L0362:
+0362 : 23 04            "# "            mov     a,#004H
+0364 : 83               " "             ret
+                                ;
+0365                            L0365:
+0365 : 18               " "             inc     r0
+0366 : 60               "`"             add     a,@r0
+0367                            L0367:
+0367 : 18               " "             inc     r0
+0368 : 60               "`"             add     a,@r0
+0369 : 18               " "             inc     r0
+036A : 20               " "             xch     a,@r0
+036B : 83               " "             ret
+                                ;
+036C                            L036C:
+036C : D5               " "             sel     rb1
+036D : 00               " "             nop
+036E : 00               " "             nop
+036F : B9 80            "  "            mov     r1,#080H
+0371 : 77               "w"             rr      a
+0372 : 53 07            "S "            anl     a,#007H
+0374 : AA               " "             mov     r2,a
+0375                            L0375:
+0375 : FA               " "             mov     a,r2
+0376 : C6 7E            " ~"            jz      L037E
+0378 : F9               " "             mov     a,r1
+0379 : E7               " "             rl      a
+037A : A9               " "             mov     r1,a
+037B : CA               " "             dec     r2
+037C : 64 75            "du"            jmp     L0375
+                                ;
+037E                            L037E:
+037E : F9               " "             mov     a,r1
+037F : 53 0F            "S "            anl     a,#00FH
+0381 : C5               " "             sel     rb0
+0382 : B9 10            "  "            mov     r1,#010H
+0384 : 41               "A"             orl     a,@r1
+0385 : A1               " "             mov     @r1,a
+0386 : 83               " "             ret
+
+                                ;-----------------------------------------
+                                ; Write data to latches
+                                ; in:
+                                ;       R0 = pointer to data
+                                ;       R1 = latch select (inverted one-hot)
+0387                            L0387:
+0387 : F0               " "             mov     a,@r0
+0388 : 37               "7"             cpl     a
+0389 : 3A               ":"             outl    p2,a
+038A : F9               " "             mov     a,r1            ; strobe out
+038B : 02               " "             outl    bus,a           
+038C : 77               "w"             rr      a               ; shift latch select
+038D : A9               " "             mov     r1,a
+038E : 23 FF            "# "            mov     a,#0FFH         ; end strobe
+0390 : 02               " "             outl    bus,a
+0391 : 83               " "             ret
+                                ;
+0392                            L0392:
+0392 : D5               " "             sel     rb1
+0393 : FC               " "             mov     a,r4
+0394 : C5               " "             sel     rb0
+0395 : F2 9C            "  "            jb7     L039C
+0397                            L0397:
+0397 : FB               " "             mov     a,r3
+0398 : 53 FE            "S "            anl     a,#0FEH
+039A : AB               " "             mov     r3,a
+039B : 83               " "             ret
+                                ;
+039C                            L039C:
+039C : FB               " "             mov     a,r3
+039D : 43 01            "C "            orl     a,#001H
+039F : AB               " "             mov     r3,a
+03A0                            L03A0:
+03A0 : F0               " "             mov     a,@r0
+03A1 : 43 04            "C "            orl     a,#004H
+03A3 : A0               " "             mov     @r0,a
+03A4 : 83               " "             ret
+                                ;
+03A5 : 00               " "             nop
+03A6 : 00               " "             nop
+03A7 : 00               " "             nop
+03A8 : 00               " "             nop
+03A9 : 00               " "             nop
+03AA : 00               " "             nop
+03AB : 00               " "             nop
+03AC : 00               " "             nop
+03AD : 00               " "             nop
+03AE : 00               " "             nop
+03AF : 00               " "             nop
+03B0 : 00               " "             nop
+03B1 : 00               " "             nop
+03B2 : 00               " "             nop
+03B3 : 00               " "             nop
+03B4 : 00               " "             nop
+03B5 : 00               " "             nop
+03B6 : 00               " "             nop
+03B7 : 00               " "             nop
+03B8 : 00               " "             nop
+03B9 : 00               " "             nop
+03BA : 00               " "             nop
+03BB : 00               " "             nop
+03BC : 00               " "             nop
+03BD : 00               " "             nop
+03BE : 00               " "             nop
+03BF : 00               " "             nop
+03C0 : 00               " "             nop
+03C1 : 00               " "             nop
+03C2 : 00               " "             nop
+03C3 : 00               " "             nop
+03C4 : 00               " "             nop
+03C5 : 00               " "             nop
+03C6 : 00               " "             nop
+03C7 : 00               " "             nop
+03C8 : 00               " "             nop
+03C9 : 00               " "             nop
+03CA : 00               " "             nop
+03CB : 00               " "             nop
+03CC : 00               " "             nop
+03CD : 00               " "             nop
+03CE : 00               " "             nop
+03CF : 00               " "             nop
+03D0 : 00               " "             nop
+03D1 : 00               " "             nop
+03D2 : 00               " "             nop
+03D3 : 00               " "             nop
+03D4 : 00               " "             nop
+03D5 : 00               " "             nop
+03D6 : 00               " "             nop
+03D7 : 00               " "             nop
+03D8 : 00               " "             nop
+03D9 : 00               " "             nop
+03DA : 00               " "             nop
+03DB : 00               " "             nop
+03DC : 00               " "             nop
+03DD : 00               " "             nop
+03DE : 00               " "             nop
+03DF : 00               " "             nop
+03E0 : 00               " "             nop
+03E1 : 00               " "             nop
+03E2 : 00               " "             nop
+03E3 : 00               " "             nop
+03E4 : 00               " "             nop
+03E5 : 00               " "             nop
+03E6 : 00               " "             nop
+03E7 : 00               " "             nop
+03E8 : 00               " "             nop
+03E9 : 00               " "             nop
+03EA : 00               " "             nop
+03EB : 00               " "             nop
+03EC : 00               " "             nop
+03ED : 00               " "             nop
+03EE : 00               " "             nop
+03EF : 00               " "             nop
+03F0 : 00               " "             nop
+03F1 : 00               " "             nop
+03F2 : 00               " "             nop
+03F3 : 00               " "             nop
+03F4 : 00               " "             nop
+03F5 : 00               " "             nop
+03F6 : 00               " "             nop
+03F7 : 00               " "             nop
+03F8 : 00               " "             nop
+03F9 : 00               " "             nop
+03FA : 00               " "             nop
+03FB : 00               " "             nop
+03FC : 00               " "             nop
+03FD : 00               " "             nop
+03FE : 00               " "             nop
+03FF : 00               " "             nop
+
+;--------------------------------------------------------------
+Symbol table
+============
+
+Value           Type    Name
+-----           ----    ----
+002B            Code    L002B
+003D            Code    L003D
+006D            Code    L006D
+0074            Code    L0074
+007B            Code    L007B
+0087            Code    L0087
+008E            Code    L008E
+0098            Code    L0098
+00CD            Code    L00CD
+00F4            Code    L00F4
+00F9            Code    L00F9
+00FF            Code    L00FF
+0106            Code    L0106
+0108            Code    L0108
+010F            Code    L010F
+0131            Code    L0131
+0137            Code    L0137
+014A            Code    L014A
+0161            Code    L0161
+0177            Code    L0177
+0190            Code    L0190
+01B1            Code    L01B1
+01CF            Code    L01CF
+01D9            Code    L01D9
+01DB            Code    L01DB
+01E7            Code    L01E7
+01EB            Code    L01EB
+01FA            Code    L01FA
+01FE            Code    L01FE
+0210            Code    L0210
+0216            Code    L0216
+0222            Code    L0222
+023B            Code    L023B
+0246            Code    L0246
+0252            Code    L0252
+0257            Code    L0257
+0267            Code    L0267
+0271            Code    L0271
+0275            Code    L0275
+0279            Code    L0279
+027C            Code    L027C
+027E            Code    L027E
+02A5            Code    L02A5
+02C6            Code    L02C6
+02DE            Code    L02DE
+02E0            Code    L02E0
+02FA            Code    L02FA
+0305            Code    L0305
+030B            Code    L030B
+030F            Code    L030F
+0315            Code    L0315
+031C            Code    L031C
+0323            Code    L0323
+032A            Code    L032A
+0331            Code    L0331
+0338            Code    L0338
+033F            Code    L033F
+0340            Code    L0340
+034D            Code    L034D
+0351            Code    L0351
+0353            Code    L0353
+035B            Code    L035B
+0362            Code    L0362
+0365            Code    L0365
+0367            Code    L0367
+036C            Code    L036C
+0375            Code    L0375
+037E            Code    L037E
+0387            Code    L0387
+0392            Code    L0392
+0397            Code    L0397
+039C            Code    L039C
+03A0            Code    L03A0
+
+Number of symbols:                      73
+
+;--------------------------------------------------------------
